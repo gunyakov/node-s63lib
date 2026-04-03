@@ -74,6 +74,29 @@ git push origin v0.1.1
 
 This triggers `.github/workflows/prebuild.yml`, which builds native binaries and uploads `prebuilds/*.tar.gz` assets to the tagged GitHub Release.
 
+## Auto-build binaries on every push to main
+
+Every push to `main` triggers `.github/workflows/prebuild-main.yml`.
+
+It builds fresh binaries for Linux x64, Windows x64, macOS x64, and macOS arm64, then publishes them as:
+
+1. Workflow artifacts (`prebuilds-<platform>`) in the Actions run
+2. Assets on a rolling prerelease tag `main-latest`
+
+This is useful for continuously downloadable binaries from GitHub between formal version tags.
+
+## Auto bump patch version on main
+
+Every push to `main` also triggers `.github/workflows/bump-version.yml`.
+
+It will:
+
+1. Increment patch version in `package.json` and `package-lock.json`
+2. Commit the version update to `main`
+3. Create and push a matching tag (`vX.Y.Z`)
+
+Pushing the tag automatically triggers `.github/workflows/prebuild.yml`, so versioned GitHub Release binaries are generated for npm installs.
+
 ## Quick usage
 
 ```js

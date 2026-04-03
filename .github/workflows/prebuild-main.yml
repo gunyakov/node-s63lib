@@ -1,0 +1,63 @@
+name: Build Main Prebuilds
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  prebuild-main:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: linux-x64
+            os: ubuntu-latest
+          - name: windows-x64
+            os: windows-latest
+          - name: macos-x64
+            os: macos-13
+          - name: macos-arm64
+            os: macos-14
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build prebuild tarball
+        run: npm run prebuild
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: prebuilds-${{ matrix.name }}
+          path: prebuilds/*.tar.gz
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish rolling main release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: main-latest
+          name: main-latest
+          target_commitish: ${{ github.sha }}
+          prerelease: true
+          make_latest: false
+          files: prebuilds/*.tar.gz
+          overwrite_files: true
