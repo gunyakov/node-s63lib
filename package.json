@@ -1,28 +1,47 @@
 {
-  "name": "node-s63",
+  "name": "node-s63lib",
   "version": "0.1.0",
   "description": "Node.js N-API wrapper for s63lib",
   "main": "index.js",
   "scripts": {
     "build": "node-gyp build",
     "rebuild": "node-gyp rebuild",
-    "install": "node-gyp rebuild",
+    "install": "prebuild-install --runtime napi || node-gyp rebuild",
+    "prebuild": "prebuild --runtime napi --target 8 --strip",
+    "prepublishOnly": "npm run build",
     "test": "node -e \"const s63=require('./index.js'); console.log(Object.keys(s63).length > 0 ? 'ok' : 'fail')\""
   },
   "keywords": [
     "s63",
     "s57",
     "napi",
-    "native-addon"
+    "native-addon",
+    "ENC",
+    "electronic-navigational-chart",
+    "maritime",
+    "navigation"
   ],
-  "author": "",
+  "author": "Oleg Gunyakov <web@gunyakov.pro>",
   "license": "MIT",
   "type": "commonjs",
   "gypfile": true,
   "dependencies": {
-    "node-addon-api": "^8.7.0"
+    "node-addon-api": "^8.7.0",
+    "prebuild-install": "^7.1.3"
   },
   "devDependencies": {
-    "node-gyp": "^12.2.0"
+    "node-gyp": "^12.2.0",
+    "prebuild": "^13.0.1"
+  },
+  "binary": {
+    "module_name": "addon",
+    "module_path": "./build/Release",
+    "napi_versions": [
+      8
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gunyakov/node-s63lib.git"
   }
 }

@@ -31,14 +31,20 @@ git add s63lib
 git commit -m "Update s63lib submodule"
 ```
 
-## Build
+## Install
+
+`npm install node-s63lib` will try to download a precompiled native binary from GitHub Releases first.
+
+If no matching binary exists for your platform/architecture, it falls back to local `node-gyp` compilation.
+
+## Build locally
 
 Requirements:
 
 1. Node.js 18+
 2. Build toolchain for `node-gyp` (gcc/g++, make, python)
 
-Install and compile:
+Install and compile (fallback mode):
 
 ```bash
 npm install
@@ -49,6 +55,24 @@ Manual rebuild:
 ```bash
 npm run rebuild
 ```
+
+## GitHub prebuild workflow
+
+Precompiled binaries are built by GitHub Actions (not by end users) for:
+
+1. Linux x64
+2. Windows x64
+3. macOS x64
+4. macOS arm64
+
+To publish prebuilds:
+
+```bash
+git tag v0.1.1
+git push origin v0.1.1
+```
+
+This triggers `.github/workflows/prebuild.yml`, which builds native binaries and uploads `prebuilds/*.tar.gz` assets to the tagged GitHub Release.
 
 ## Quick usage
 
