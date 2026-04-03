@@ -1,0 +1,28 @@
+{
+  "name": "node-s63",
+  "version": "0.1.0",
+  "description": "Node.js N-API wrapper for s63lib",
+  "main": "index.js",
+  "scripts": {
+    "build": "node-gyp build",
+    "rebuild": "node-gyp rebuild",
+    "install": "node-gyp rebuild",
+    "test": "node -e \"const s63=require('./index.js'); console.log(Object.keys(s63).length > 0 ? 'ok' : 'fail')\""
+  },
+  "keywords": [
+    "s63",
+    "s57",
+    "napi",
+    "native-addon"
+  ],
+  "author": "",
+  "license": "MIT",
+  "type": "commonjs",
+  "gypfile": true,
+  "dependencies": {
+    "node-addon-api": "^8.7.0"
+  },
+  "devDependencies": {
+    "node-gyp": "^12.2.0"
+  }
+}
