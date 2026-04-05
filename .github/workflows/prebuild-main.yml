@@ -9,15 +9,10 @@ on:
 permissions:
   contents: write
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
   prebuild-main:
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     strategy:
       fail-fast: false
       matrix:
@@ -33,37 +28,29 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: recursive
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 24
 
-      - name: Setup Python (Windows)
-        if: runner.os == 'Windows'
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Setup MSBuild (Windows)
-        if: runner.os == 'Windows'
-        uses: microsoft/setup-msbuild@v2
-
-      - name: Configure MSVC for node-gyp (Windows)
-        if: runner.os == 'Windows'
-        run: npm config set msvs_version 2022
-
       - name: Install dependencies
+        env:
+          GYP_MSVS_VERSION: 2022
+          npm_config_msvs_version: 2022
         run: npm ci --ignore-scripts
 
       - name: Build prebuild tarball
+        env:
+          GYP_MSVS_VERSION: 2022
+          npm_config_msvs_version: 2022
         run: npm run prebuild
 
       - name: Upload workflow artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: prebuilds-${{ matrix.name }}
           path: prebuilds/*.tar.gz
@@ -71,12 +58,9 @@ jobs:
           retention-days: 30
 
       - name: Publish rolling main release assets
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: main-latest
-          name: main-latest
-          target_commitish: ${{ github.sha }}
-          prerelease: true
-          make_latest: false
-          files: prebuilds/*.tar.gz
-          overwrite_files: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view main-latest >/dev/null 2>&1 || gh release create main-latest --title main-latest --target "${GITHUB_SHA}" --prerelease --notes "Rolling prebuild binaries from main"
+          gh release edit main-latest --target "${GITHUB_SHA}" --prerelease --title main-latest
+          gh release upload main-latest prebuilds/*.tar.gz --clobber
