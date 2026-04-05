@@ -11,7 +11,7 @@ This repository tracks `s63lib` as a Git submodule, so the library is linked by 
 Clone with submodules:
 
 ```bash
-git clone --recurse-submodules <your-repo-url>
+git clone --recurse-submodules https://githib.com/gunyakov/node-s63lib.git
 ```
 
 If you already cloned:
@@ -100,19 +100,23 @@ Pushing the tag automatically triggers `.github/workflows/prebuild.yml`, so vers
 ## Quick usage
 
 ```js
-const s63 = require("node-s63");
+const s63 = require("node-s63lib");
 
 // Error enum values exported by addon
 console.log(s63.S63Error.S63_ERR_OK); // 0
 
-const userPermit = s63.createUserPermit("98765", "12348", "01");
+const userPermit = s63.createUserPermit(
+  "98765", // mKey: manufacturer key from your S-63 provider
+  "12348", // hwId: your device/system hardware ID
+  "01", // mId: manufacturer ID assigned by your provider
+);
 console.log(userPermit); // e.g. 73871727080876A07E450C043031
 ```
 
 ## Example: extract cell keys and decrypt file
 
 ```js
-const s63 = require("node-s63");
+const s63 = require("node-s63lib");
 
 const hwId = "12348";
 const cellPermit =
@@ -140,13 +144,13 @@ console.log(result.data.length);
 ## Example: decrypt and save directly
 
 ```js
-const s63 = require("node-s63");
+const s63 = require("node-s63lib");
 
 const err = s63.decryptAndUnzipCellByKey(
-  "/charts/NO4D06.000",
-  Buffer.from("C1CB518E9C", "hex"),
-  Buffer.from("421571CC66", "hex"),
-  "/out/NO4D06.000",
+  "/charts/NO4D06.000", // inPath: encrypted S-63 cell file (.000)
+  Buffer.from("C1CB518E9C", "hex"), // ck1: first 5-byte cell key from permit
+  Buffer.from("421571CC66", "hex"), // ck2: second 5-byte cell key from permit
+  "/out/NO4D06.000", // outPath: destination for decrypted/unzipped S-57 cell
 );
 
 if (err !== s63.S63Error.S63_ERR_OK) {
@@ -159,7 +163,11 @@ if (err !== s63.S63Error.S63_ERR_OK) {
 ```js
 const { S63Client, S63Error } = require("node-s63");
 
-const client = new S63Client("12348", "98765", "01");
+const client = new S63Client(
+  "12348", // hwId: your device/system hardware ID
+  "98765", // mKey: manufacturer key from your S-63 provider
+  "01", // mId: manufacturer ID assigned by your provider
+);
 
 const userPermit = client.getUserpermit();
 console.log("User permit:", userPermit);
@@ -195,7 +203,7 @@ S63Client async methods:
 Example:
 
 ```js
-const { S63Client, S63Error } = require("node-s63");
+const { S63Client, S63Error } = require("node-s63lib");
 
 async function run() {
   const client = new S63Client("12348", "98765", "01");
