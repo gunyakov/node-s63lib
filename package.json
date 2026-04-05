@@ -1,8 +1,9 @@
 {
   "name": "node-s63lib",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Node.js N-API wrapper for s63lib",
   "main": "index.js",
+  "types": "index.d.ts",
   "scripts": {
     "build": "node-gyp build",
     "rebuild": "node-gyp rebuild",
