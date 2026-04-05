@@ -33,7 +33,7 @@ jobs:
         run: npm version patch --no-git-tag-version
 
       - name: Sync lockfile metadata
-        run: npm install --package-lock-only
+        run: npm install --package-lock-only --ignore-scripts
 
       - name: Commit, tag, and push
         run: |

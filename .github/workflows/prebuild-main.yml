@@ -58,6 +58,7 @@ jobs:
           retention-days: 30
 
       - name: Publish rolling main release assets
+        shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
